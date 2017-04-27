@@ -9,6 +9,8 @@ def event_fullfeed(seconds):
     url = 'https://ls.sportradar.com/ls/feeds/?/betradar/en/Etc:UTC/gismo/event_fullfeed'
     name = 'files/event_fullfeed/{seconds:d}.json'.format(seconds=seconds)
     json = get_json(url, name)
+    if not json:
+        return
     for doc in json['doc']:
         for d in doc['data']:
             if d['_sid'] != 1:
@@ -36,7 +38,13 @@ def match(id, seconds):
 
 
 def get_json(url, name):
-    response = request(method='GET', url=url)
+    response = None
+    try:
+        response = request(method='GET', url=url)
+    except Exception:
+        pass
+    if not response:
+        return
     json = response.json()
     with open(name, 'w') as resource:
         contents = dumps(json, indent=4, sort_keys=True)
