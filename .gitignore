@@ -1,4 +1,6 @@
 files/event_fullfeed/*
 !files/event_fullfeed/.gitkeep
-files/match/*
-!files/match/.gitkeep
+files/match_timeline/*
+!files/match_timeline/.gitkeep
+files/stats_match_situation/*
+!files/stats_match_situation/.gitkeep
