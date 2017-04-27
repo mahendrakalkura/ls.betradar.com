@@ -53,9 +53,9 @@ def get_json(url, name):
 
 
 def main():
-    seconds = time()
-    seconds = int(seconds)
     while True:
+        seconds = time()
+        seconds = int(seconds)
         event_fullfeed(seconds)
 
 
