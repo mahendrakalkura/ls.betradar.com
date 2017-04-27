@@ -1,49 +1,14 @@
 from json import dumps
-from pprint import pprint
 from time import time
 
 from requests import request
 
 
-def event_fullfeed():
+def event_fullfeed(seconds):
     print('event_fullfeed()')
     url = 'https://ls.sportradar.com/ls/feeds/?/betradar/en/Etc:UTC/gismo/event_fullfeed'
-    json = get_json(url, 'event_fullfeed/')
-    return json
-
-
-def match(id):
-    message = '    match({id:d})'.format(id=id)
-    print(message)
-
-    name = 'match/{id:d}'.format(id=id)
-
-    url = 'https://ls.sportradar.com/ls/feeds/?/betradar/en/Etc:UTC/gismo/match_timeline/{id:d}'.format(id=id)
-    get_json(url, name)
-
-    url = 'https://ls.sportradar.com/ls/feeds/?/common/en/Etc:UTC/gismo/stats_match_situation/{id:d}'.format(id=id)
-    get_json(url, name)
-
-
-def get_json(url, name):
-    response = request(method='GET', url=url)
-    json = response.json()
-    file = get_file(name)
-    with open(file, 'w') as resource:
-        contents = dumps(json)
-        resource.write(contents)
-    return json
-
-
-def get_file(name):
-    seconds = time()
-    seconds = int(seconds)
-    file = 'files/{name:s}-{seconds:d}'.format(name=name, seconds=seconds)
-    return file
-
-
-def main():
-    json = event_fullfeed()
+    name = 'files/event_fullfeed/{seconds:d}.json'.format(seconds=seconds)
+    json = get_json(url, name)
     for doc in json['doc']:
         for d in doc['data']:
             if d['_sid'] != 1:
@@ -54,7 +19,36 @@ def main():
                         if '_mclink' not in m or not m['_mclink']:
                             continue
                         id = m['_id']
-                        match(id)
+                        match(id, seconds)
+
+
+def match(id, seconds):
+    message = '    match({id:d})'.format(id=id)
+    print(message)
+
+    name = 'files/match_timeline/{id:d}-{seconds:d}.json'.format(id=id, seconds=seconds)
+    url = 'https://ls.sportradar.com/ls/feeds/?/betradar/en/Etc:UTC/gismo/match_timeline/{id:d}'.format(id=id)
+    get_json(url, name)
+
+    name = 'files/stats_match_situation/{id:d}-{seconds:d}.json'.format(id=id, seconds=seconds)
+    url = 'https://ls.sportradar.com/ls/feeds/?/common/en/Etc:UTC/gismo/stats_match_situation/{id:d}'.format(id=id)
+    get_json(url, name)
+
+
+def get_json(url, name):
+    response = request(method='GET', url=url)
+    json = response.json()
+    with open(name, 'w') as resource:
+        contents = dumps(json, indent=4, sort_keys=True)
+        resource.write(contents)
+    return json
+
+
+def main():
+    seconds = time()
+    seconds = int(seconds)
+    while True:
+        event_fullfeed(seconds)
 
 
 if __name__ == '__main__':
