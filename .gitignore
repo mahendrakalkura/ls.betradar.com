@@ -1,0 +1,4 @@
+files/event_fullfeed/*
+!files/event_fullfeed/.gitkeep
+files/match/*
+!files/match/.gitkeep
