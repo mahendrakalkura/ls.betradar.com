@@ -23,15 +23,15 @@ def download_event_fullfeed(seconds):
     if not json:
         return
     for doc in json['doc']:
-        for d in doc['data']:
-            if d['_sid'] != 1:
+        for data in doc['data']:
+            if data['_sid'] != 1:
                 continue
-            for category in d['realcategories']:
+            for category in data['realcategories']:
                 for tournament in category['tournaments']:
-                    for m in tournament['matches']:
-                        if '_mclink' not in m or not m['_mclink']:
+                    for match in tournament['matches']:
+                        if '_mclink' not in match or not match['_mclink']:
                             continue
-                        id = m['_id']
+                        id = match['_id']
                         download_match(id, seconds)
 
 
@@ -73,15 +73,15 @@ def report_event_full_feed_statuses():
         if not json:
             continue
         for doc in json['doc']:
-            for d in doc['data']:
-                if d['_sid'] != 1:
+            for data in doc['data']:
+                if data['_sid'] != 1:
                     continue
-                for category in d['realcategories']:
+                for category in data['realcategories']:
                     for tournament in category['tournaments']:
-                        for m in tournament['matches']:
-                            if '_mclink' not in m or not m['_mclink']:
+                        for match in tournament['matches']:
+                            if '_mclink' not in match or not match['_mclink']:
                                 continue
-                            statuses.add(m['status']['name'])
+                            statuses.add(match['status']['name'])
     pprint(statuses)
 
 
@@ -99,13 +99,13 @@ def report_match_timeline_types():
         json = loads(contents)
         if not json:
             continue
-        for d in json['doc']:
-            for e in d['data']['events']:
-                if 'coordinates' in e:
-                    for c in e['coordinates']:
-                        types.add(e['type'])
+        for doc in json['doc']:
+            for event in doc['data']['events']:
+                if 'coordinates' in event:
+                    for coordinates in event['coordinates']:
+                        types.add(event['type'])
                 else:
-                    types.add(e['type'])
+                    types.add(event['type'])
     pprint(types)
 
 
@@ -123,8 +123,8 @@ def report_match_timeline_events(id):
         if not json:
             continue
         events = []
-        for d in json['doc']:
-            for e in d['data']['events']:
+        for doc in json['doc']:
+            for e in doc['data']['events']:
                 team = None
                 if 'coordinates' in e:
                     for c in e['coordinates']:
@@ -174,9 +174,9 @@ def report_stats_match_situation(id):
         if not json:
             continue
         times = []
-        for d in json['doc']:
-            for e in d['data']['data']:
-                times.append(e['time'])
+        for doc in json['doc']:
+            for data in doc['data']['data']:
+                times.append(data['time'])
         pprint(times)
         break
 
