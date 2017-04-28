@@ -14,5 +14,9 @@ How to run?
 ```
 $ cd ls.betradar.com
 $ workon ls.betradar.com
-$ python run.py
+$ python manage.py --download
+$ python manage.py --report --event-full-feed --statuses
+$ python manage.py --report --match-timeline --types
+$ python manage.py --report --match-timeline --events $id
+$ python manage.py --report --stats-match-situation $id
 ```
