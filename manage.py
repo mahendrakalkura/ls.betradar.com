@@ -29,8 +29,6 @@ def download_event_fullfeed(seconds):
             for category in data['realcategories']:
                 for tournament in category['tournaments']:
                     for match in tournament['matches']:
-                        if '_mclink' not in match or not match['_mclink']:
-                            continue
                         id = match['_id']
                         download_match(id, seconds)
 
@@ -43,10 +41,6 @@ def download_match(id, seconds):
     url = 'https://ls.sportradar.com/ls/feeds/?/betradar/en/Etc:UTC/gismo/match_timeline/{id:d}'.format(id=id)
     fetch(url, name)
 
-    name = 'files/stats_match_situation/{id:d}-{seconds:d}.json'.format(id=id, seconds=seconds)
-    url = 'https://ls.sportradar.com/ls/feeds/?/common/en/Etc:UTC/gismo/stats_match_situation/{id:d}'.format(id=id)
-    fetch(url, name)
-
 
 def report(options):
     if options[0] == '--event-full-feed' and options[1] == '--statuses':
@@ -55,8 +49,8 @@ def report(options):
         report_match_timeline_types()
     if options[0] == '--match-timeline' and options[1] == '--events':
         report_match_timeline_events(options[2])
-    if options[0] == '--stats-match-situation':
-        report_stats_match_situation(options[1])
+    if options[0] == '--match-timeline' and options[1] == '--ballcoordinates':
+        report_match_timeline_ballcoordinates()
 
 
 def report_event_full_feed_statuses():
@@ -160,8 +154,8 @@ def report_match_timeline_events(id):
     pprint(events)
 
 
-def report_stats_match_situation(id):
-    pattern = 'files/stats_match_situation/{id:s}-*.json'.format(id=id)
+def report_match_timeline_ballcoordinates():
+    pattern = 'files/match_timeline/*.json'.format(id=id)
     files = glob(pattern)
     progress_bar = ProgressBar()
     for file in progress_bar(files):
@@ -173,12 +167,12 @@ def report_stats_match_situation(id):
         json = loads(contents)
         if not json:
             continue
-        times = []
         for doc in json['doc']:
-            for data in doc['data']['data']:
-                times.append(data['time'])
-        pprint(times)
-        break
+            for e in doc['data']['events']:
+                if e['type'] == 'ballcoordinates':
+                    if 'coordinates' not in e:
+                        print(file)
+                        print(e)
 
 
 def fetch(url, name):
